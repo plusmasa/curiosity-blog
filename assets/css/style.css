@@ -323,11 +323,11 @@ figcaption,
 }
 .post-body h2 {
   font-size: 1.75rem;
-  margin: 2.2em 0 0.6em;
+  margin: 2.2em 0 1.2em;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55em;
+  gap: 1.1em;
 }
 .post-body h2::after {
   content: "";
