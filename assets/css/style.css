@@ -434,3 +434,29 @@ figcaption,
 @media (prefers-reduced-motion: reduce) {
   .echo-bg { display: none; }
 }
+
+/* Article-end countdown: monospace DDDD:HH:MM:SS ticking to a shared target. */
+.post-countdown {
+  margin: 4em auto 0;
+  padding-top: 2em;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  text-align: center;
+}
+.post-countdown__label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.post-countdown__value {
+  font-family: var(--mono);
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
