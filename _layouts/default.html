@@ -23,7 +23,7 @@
       <p class="site-tagline">{{ site.description }}</p>
     </header>
 
-    <main class="wrap" id="main" role="main">{{ content }}</main>
+    <main class="{% if page.layout == 'post' %}post-frame{% else %}home{% endif %}" id="main" role="main">{{ content }}</main>
 
     <footer class="site-footer">
       © {{ 'now' | date: '%Y' }} {{ site.author | default: site.title }}
