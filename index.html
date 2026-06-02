@@ -1,0 +1,30 @@
+---
+layout: default
+---
+
+{% if site.posts.size == 0 %}
+<p>No posts yet — the first curious idea is on its way.</p>
+{% else %}
+<ul class="post-list">
+  {% for post in site.posts %}
+  <li>
+    <a class="post-card" href="{{ post.url | relative_url }}">
+      {% if post.image %}
+      <img class="thumb" src="{{ post.image | relative_url }}" alt="{{ post.title }}" loading="lazy" />
+      {% endif %}
+      <div class="body">
+        <h2>{{ post.title }}</h2>
+        <p class="post-meta">
+          <time datetime="{{ post.date | date_to_xmlschema }}">
+            {{ post.date | date: '%B %-d, %Y' }}
+          </time>
+        </p>
+        {% if post.description %}
+        <p class="excerpt">{{ post.description }}</p>
+        {% endif %}
+      </div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

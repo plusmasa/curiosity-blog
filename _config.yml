@@ -1,0 +1,20 @@
+title: Curiosity Blog
+description: One curious idea, illustrated and explained — published daily.
+author: Curiosity Blogger
+
+# Pretty, dated permalinks: /2025/02/01/slug/
+permalink: /:year/:month/:day/:title/
+
+# Newest content first in collections.
+paginate: 10
+
+# Jekyll build settings
+markdown: kramdown
+plugins: []
+
+# Keep pipeline + tooling files out of the built site.
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
