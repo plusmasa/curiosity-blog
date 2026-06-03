@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'When Experts Get Louder and the Public Goes Quiet: The AI Normalization Trap'
+title: 'We''ve hit collective freeze response'
 date: '2026-06-02 12:00:00 -0000'
 description: >-
   Action-oriented AI-prep searches peaked in mid-2025 and have fallen 36–69% —
