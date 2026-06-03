@@ -4,6 +4,9 @@ layout: default
 
 <article class="post">
   <h1 class="post-title divided">{{ page.title }}</h1>
+  {% if page.article_code %}
+  <p class="post-code">{{ page.article_code }}</p>
+  {% endif %}
   <p class="post-kicker">
     <time datetime="{{ page.date | date_to_xmlschema }}">
       {{ page.date | date: '%B %-d, %Y' }}
@@ -12,9 +15,6 @@ layout: default
     · {{ page.tags | join: ' · ' }}
     {% endif %}
   </p>
-  {% if page.article_code %}
-  <p class="post-code">{{ page.article_code }}</p>
-  {% endif %}
 
   {% if page.image %}
   <img class="post-hero" src="{{ page.image | relative_url }}" alt="{{ page.title }}" />

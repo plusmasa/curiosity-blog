@@ -474,8 +474,9 @@ figcaption,
 }
 
 .post-code {
+  display: block;
   text-align: center;
-  margin: 0 0 2.5rem;
+  margin: 0.75rem auto 0;
 }
 
 .post-list__code {
