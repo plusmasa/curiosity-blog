@@ -460,3 +460,21 @@ figcaption,
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
+
+/* Article codes — stable 5-char identifier rendered under the kicker and in
+   the home listing. Muted monospace; the maintainer refers to these when
+   driving the edit-post / regen-image commands. */
+.post-code,
+.post-list__code {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  opacity: 0.7;
+  margin: 0.2rem 0 0;
+}
+
+.post-list__code {
+  display: inline;
+  margin-left: 0.6em;
+}

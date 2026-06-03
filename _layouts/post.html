@@ -12,6 +12,9 @@ layout: default
     · {{ page.tags | join: ' · ' }}
     {% endif %}
   </p>
+  {% if page.article_code %}
+  <p class="post-code">{{ page.article_code }}</p>
+  {% endif %}
 
   {% if page.image %}
   <img class="post-hero" src="{{ page.image | relative_url }}" alt="{{ page.title }}" />

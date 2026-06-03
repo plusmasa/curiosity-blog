@@ -13,6 +13,9 @@ layout: default
   <li>
     <a class="post-link" href="{{ post.url | relative_url }}">
       <span class="post-link__title">{{ post.title }}</span>
+      {% if post.article_code %}
+      <span class="post-list__code">{{ post.article_code }}</span>
+      {% endif %}
       <span class="post-date">
         <time datetime="{{ post.date | date_to_xmlschema }}">
           {{ post.date | date: "%b %-d, '%y" }}
