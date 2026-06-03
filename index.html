@@ -27,10 +27,13 @@ layout: default
 {% endif %}
 
 <script type="module">
-  // Echo home background — OGL + domain-warped fbm ink shader.
-  // Loaded only on the home page. Skipped when reduced motion is set.
+  // Echo home background — two-pass OGL pipeline:
+  //   1) ink pass: domain-warped fbm rendered to an offscreen texture.
+  //   2) ripple pass: mouse-following radial warp + RGB channel split
+  //      (chromatic aberration) applied as a post-process to the ink texture.
+  // Skipped entirely when reduced motion is set.
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    import('https://esm.sh/ogl@1.0.11').then(({ Renderer, Program, Mesh, Triangle }) => {
+    import('https://esm.sh/ogl@1.0.11').then(({ Renderer, Program, Mesh, Triangle, RenderTarget }) => {
       const canvas = document.getElementById('echo-bg');
       if (!canvas) return;
       const renderer = new Renderer({
@@ -46,7 +49,9 @@ layout: default
         varying vec2 vUv;
         void main(){ vUv = uv; gl_Position = vec4(position, 0.0, 1.0); }
       `;
-      const frag = `
+
+      // ----- Pass 1: ink fbm -----
+      const inkFrag = `
         precision highp float;
         varying vec2 vUv;
         uniform float uTime;
@@ -90,18 +95,80 @@ layout: default
           gl_FragColor = vec4(col, 1.0);
         }
       `;
+
+      // ----- Pass 2: ripple + chromatic aberration -----
+      // Adapted from skillBillLandingPage/crt-effect.js, simplified for a
+      // fullscreen procedural background (no scanlines, no grid, no glitch).
+      const rippleFrag = `
+        precision highp float;
+        varying vec2 vUv;
+        uniform sampler2D uInk;
+        uniform float uTime;
+        uniform vec2 uMouse;       // 0..1, with y already flipped to match texture space
+        uniform vec2 uRes;
+        void main(){
+          vec2 uv = vUv;
+          float aspect = uRes.x / uRes.y;
+          vec2 uvA = uv * vec2(aspect, 1.0);
+          vec2 mA  = uMouse * vec2(aspect, 1.0);
+          float dist = distance(uvA, mA);
+          float mouseInf = smoothstep(0.55, 0.0, dist);
+
+          // Ripple warp — radial, animated.
+          vec2 radial = normalize(uv - uMouse + 0.0001);
+          float ripple = sin(dist * 12.0 - uTime * 1.6) * 0.5 + 0.5;
+          vec2 wuv = uv + radial * mouseInf * 0.020 * ripple;
+
+          // RGB channel split along the radial direction.
+          float aberr = mouseInf * 0.018;
+          vec2 uvR = wuv + radial * aberr;
+          vec2 uvG = wuv;
+          vec2 uvB = wuv - radial * aberr;
+
+          float r = texture2D(uInk, uvR).r;
+          float g = texture2D(uInk, uvG).g;
+          float b = texture2D(uInk, uvB).b;
+          gl_FragColor = vec4(r, g, b, 1.0);
+        }
+      `;
+
       const geometry = new Triangle(gl);
-      const program = new Program(gl, {
-        vertex: vert, fragment: frag,
-        uniforms: { uTime: { value: 0 }, uRes: { value: [gl.canvas.width, gl.canvas.height] } },
+
+      // FBO sized to the canvas; resized on window resize.
+      let target = new RenderTarget(gl, { width: 2, height: 2 });
+
+      const inkProgram = new Program(gl, {
+        vertex: vert, fragment: inkFrag,
+        uniforms: { uTime: { value: 0 }, uRes: { value: [2, 2] } },
       });
-      const mesh = new Mesh(gl, { geometry, program });
+      const inkMesh = new Mesh(gl, { geometry, program: inkProgram });
+
+      const rippleProgram = new Program(gl, {
+        vertex: vert, fragment: rippleFrag,
+        uniforms: {
+          uInk:   { value: target.texture },
+          uTime:  { value: 0 },
+          uMouse: { value: [0.5, 0.5] },
+          uRes:   { value: [2, 2] },
+        },
+      });
+      const rippleMesh = new Mesh(gl, { geometry, program: rippleProgram });
 
       function resize(){
         renderer.setSize(innerWidth, innerHeight);
-        program.uniforms.uRes.value = [gl.canvas.width, gl.canvas.height];
+        const w = gl.canvas.width, h = gl.canvas.height;
+        target = new RenderTarget(gl, { width: w, height: h });
+        rippleProgram.uniforms.uInk.value = target.texture;
+        inkProgram.uniforms.uRes.value = [w, h];
+        rippleProgram.uniforms.uRes.value = [w, h];
       }
       addEventListener('resize', resize); resize();
+
+      // Mouse tracking — flip Y so it matches texture (origin bottom-left).
+      addEventListener('mousemove', (e) => {
+        rippleProgram.uniforms.uMouse.value[0] = e.clientX / innerWidth;
+        rippleProgram.uniforms.uMouse.value[1] = 1.0 - e.clientY / innerHeight;
+      });
 
       // Pause when the tab is hidden to save battery.
       let running = true;
@@ -109,11 +176,17 @@ layout: default
         running = !document.hidden;
         if (running) frame();
       });
+
       const t0 = performance.now();
       function frame(){
         if (!running) return;
-        program.uniforms.uTime.value = (performance.now() - t0) / 1000;
-        renderer.render({ scene: mesh });
+        const t = (performance.now() - t0) / 1000;
+        inkProgram.uniforms.uTime.value = t;
+        rippleProgram.uniforms.uTime.value = t;
+        // Pass 1 → offscreen FBO
+        renderer.render({ scene: inkMesh, target });
+        // Pass 2 → screen, sampling the FBO texture
+        renderer.render({ scene: rippleMesh });
         requestAnimationFrame(frame);
       }
       frame();
