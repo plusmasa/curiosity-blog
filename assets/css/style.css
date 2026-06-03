@@ -471,7 +471,11 @@ figcaption,
   letter-spacing: 0.08em;
   color: var(--muted);
   opacity: 0.7;
-  margin: 0.2rem 0 0;
+}
+
+.post-code {
+  text-align: center;
+  margin: 0 0 2.5rem;
 }
 
 .post-list__code {
