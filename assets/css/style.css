@@ -132,10 +132,14 @@ figcaption,
 
 .site-title {
   margin: 0 0 0.3em;
-  font-family: var(--serif);
+  font-family: var(--mono);
   font-weight: 500;
-  font-size: 3rem;
+  font-size: 2.25rem;
   line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.45em;
+  /* tracking pushes the last letter off-center; compensate with left padding */
+  padding-left: 0.45em;
 }
 .site-title a {
   color: var(--ink);
@@ -160,7 +164,7 @@ figcaption,
     padding: 6rem 2rem 5rem;
   }
   .site-title {
-    font-size: 5rem;
+    font-size: 3.5rem;
   }
   .site-tagline {
     font-size: 1.875rem;
