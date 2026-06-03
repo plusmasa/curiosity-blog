@@ -120,7 +120,7 @@ layout: default
           vec2 wuv = uv + radial * mouseInf * 0.020 * ripple;
 
           // RGB channel split along the radial direction.
-          float aberr = mouseInf * 0.018;
+          float aberr = mouseInf * 0.055;
           vec2 uvR = wuv + radial * aberr;
           vec2 uvG = wuv;
           vec2 uvB = wuv - radial * aberr;
