@@ -21,6 +21,7 @@ insight_id: ins-57206049
 publish_intent_id: a5f178d9-ab0b-499e-9971-1c4f0544d190
 post_sha256: 63b0fb80f199ec54e02b482faf17dc52884b9a7e582d516f91d61f07a3e01873
 image: /assets/images/ai-normalization-trap-attention-without-action.png
+article_code: G33T2
 ---
 Here's a strange signal: experts are getting *more* worried about AI displacing jobs, while regular people are getting *less* curious about it. That gap is not comfort. It's a warning.
 
