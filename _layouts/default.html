@@ -22,10 +22,73 @@
       </nav>
     {% else %}
       <header class="site-header">
-        <h1 class="site-title">
+        <h1 class="site-title" data-text="{{ site.title }}">
           <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
         </h1>
       </header>
+      <script>
+        (function () {
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          var title = document.querySelector('.site-title');
+          if (!title) return;
+          var link = title.querySelector('a');
+          var original = link.textContent;
+          var locked = false;
+
+          function lock(duration) {
+            locked = true;
+            setTimeout(function () {
+              locked = false;
+              title.classList.remove('is-glitch-a', 'is-glitch-b', 'is-glitch-c');
+            }, duration);
+          }
+
+          // A — RGB split + slice shift (CSS-driven)
+          function runA() {
+            title.classList.add('is-glitch-a');
+            lock(650);
+          }
+
+          // B — Character scramble (JS-driven text mutation)
+          var SCRAMBLE = '!<>-_\\/[]{}—=+*^?#________ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          function runB() {
+            title.classList.add('is-glitch-b');
+            var start = performance.now();
+            var duration = 750;
+            function tick(now) {
+              var t = (now - start) / duration;
+              if (t >= 1) { link.textContent = original; return; }
+              var out = '';
+              for (var i = 0; i < original.length; i++) {
+                var ch = original.charAt(i);
+                var settleAt = 0.4 + (i / original.length) * 0.55;
+                if (ch === ' ' || t > settleAt) {
+                  out += ch;
+                } else {
+                  out += SCRAMBLE.charAt(Math.floor(Math.random() * SCRAMBLE.length));
+                }
+              }
+              link.textContent = out;
+              requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+            lock(800);
+          }
+
+          // C — CRT signal loss (CSS-driven)
+          function runC() {
+            title.classList.add('is-glitch-c');
+            lock(720);
+          }
+
+          var effects = [runA, runB, runC];
+          title.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (locked) return;
+            effects[Math.floor(Math.random() * effects.length)]();
+          });
+        })();
+      </script>
     {% endif %}
 
     <main class="{% if page.layout == 'post' %}post-frame{% else %}home{% endif %}" id="main" role="main">{{ content }}</main>
